@@ -50,6 +50,61 @@ function renderAxes(newXScale, xAxis) {
     return xAxis;
 }
 
+// function used for updating circles group with a transition to
+// new circles
+function renderCircles(circlesGroup, newXScale, chosenXAxis) {
+
+    circlesGroup.transition()
+      .duration(1000)
+      .attr("cx", d => newXScale(d[chosenXAxis]));
+  
+    return circlesGroup;
+}
+
+// function used for updating circles group with a transition to
+// new circles
+function renderCircles(circlesGroup, newXScale, chosenXAxis) {
+
+    circlesGroup.transition()
+      .duration(1000)
+      .attr("cx", d => newXScale(d[chosenXAxis]));
+  
+    return circlesGroup;
+}
+  
+  // function used for updating circles group with new tooltip
+function updateToolTip(chosenXAxis, circlesGroup) {
+  
+    var label;
+  
+    if (chosenXAxis === "income") {
+      label = "Income: ";
+    }
+    else {
+      label = "Obesity: ";
+    }
+  
+    var toolTip = d3.tip()
+      .attr("class", "tooltip")
+      .offset([80, -60])
+      .html(function(d) {
+        return (`${d.state}<br>${label} ${d[chosenXAxis]}`);
+      });
+  
+    circlesGroup.call(toolTip);
+  
+    circlesGroup.on("mouseover", function(data) {
+      toolTip.show(data);
+    })
+      // onmouseout event
+      .on("mouseout", function(data, index) {
+        toolTip.hide(data);
+      });
+  
+    return circlesGroup;
+}
+  
+
 
 
 
