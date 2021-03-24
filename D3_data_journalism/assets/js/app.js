@@ -307,6 +307,7 @@ d3.csv("./assets/data/data.csv").then((healthData) => {
                 }
             }
         });
+
     // y-axis event listeners 
     yLabelsGroup.selectAll("text")
     .on("click", function() {
@@ -325,34 +326,34 @@ d3.csv("./assets/data/data.csv").then((healthData) => {
 
             circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
 
-            if (chosenXAxis === "poverty") {
-                povertyLabel
+            if (chosenYAxis === "healthcare") {
+                healthcareLabel
                     .classed("active", true)
                     .classed("inactive", false);
-                ageLabel
+                smokesLabel
                     .classed("active", false)
                     .classed("inactive", true);
-                incomeLabel
+                obesityLabel
                     .classed("active", false)
                     .classed("inactive", true);
-            } else if (chosenXAxis === "age") {
-                ageLabel
+            } else if (chosenYAxis === "smokes") {
+                smokesLabel
                     .classed("active", true)
                     .classed("inactive", false);
-                povertyLabel
+                healthcareLabel
                     .classed("active", false)
                     .classed("inactive", true);
-                incomeLabel 
+                obesityLabel 
                     .classed("active", false)
                     .classed("inactive", true);
             } else {
-                incomeLabel
+                obesityLabel
                     .classed("active", true)
                     .classed("inactive", false);
-                povertyLabel
+                healthcareLabel
                     .classed("active", false)
                     .classed("inactive", true);
-                ageLabel    
+                smokesLabel    
                     .classed("active", false)
                     .classed("inactive", true);
             }
