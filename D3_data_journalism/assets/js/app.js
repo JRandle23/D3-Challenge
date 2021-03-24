@@ -192,23 +192,49 @@ d3.csv("./assets/data/data.csv").then((healthData) => {
         .attr("font-size", "10px")
         .text(function(d) { return d.abbr });
     
-    // Create group for two x-axis labels
-    var labelsGroup = chartGroup.append("g")
-        .attr("transform", `translate(${width / 2}, ${height + 20})`);
+    // Create x axis labels group
+    var xLabelsGroup = chartGroup.append("g")
+        .attr("transform", `translate(${width / 2}, ${height + 20 + margin.top})`);
     
-    var incomeLabel = labelsGroup.append("text")
+    var povertyLabel = xLabelsGroup.append("text")
         .attr("x", 0)
         .attr("y", 20)
-        .attr("value", "income") // value to grab for event listener
-        .classed("active", true)
-        .text("Income ($)");
+        .attr("value", "poverty")
+        .text("In Poverty (%)")
 
-    var smokesLabel = labelsGroup.append("text")
+    var incomeLabel = xLabelsGroup.append("text")
         .attr("x", 0)
         .attr("y", 40)
-        .attr("value", "smokes") // value to grab for event listener
-        .classed("inactive", true)
-        .text("Smokers");
+        .attr("value", "income")
+        .attr("aText", true)
+        .attr("active", true)
+        .text("Median Household Income ($)");
+
+    var ageLabel = xLabelsGroup.append("text")
+        .attr("x", 0)
+        .attr("y", 60)
+        .attr("value", "age")
+        .attr("aText", true)
+        .attr("active", true)
+        .text("Age (Median)");
+    
+    // Create y labels group
+    var yLabelsGroup = chartGroup.append("g")
+        .attr("transform", `translate(${0 - margin.left / 4}, ${height / 2})`);
+    
+    var healthcareLabel = yLabelsGroup.append("g")
+        .attr("x", 0)
+        .attr("y", 0 - 20)
+        .attr("dy", "1em")
+        .attr("transform", "rotate(-90)")
+        .attr("value", "healthcare")
+        .attr("aText", true)
+        .attr("active", true)
+        .text("Without Healthcare (%)");
+    
+    var smokesLabel = yLabelsGroup.append("g")
+    
+
 
     // append y axis
     chartGroup.append("text")
