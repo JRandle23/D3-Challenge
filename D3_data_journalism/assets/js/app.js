@@ -242,31 +242,22 @@ d3.csv("./assets/data/data.csv").then((healthData) => {
         .attr("value", "smokes")
         .text("Smokers (%)");
 
-    var ageLabel = yLabelsGroup.append("text")
+    var obesityLabel = yLabelsGroup.append("text")
         .attr("x", 0)
         .attr("y", 0 - 60)
         .attr("dy", "1em")
         .attr("transform", "rotate(-90)")
-        .attr("value", "age")
+        .attr("value", "obesity")
         .attr("aText", true)
         .attr("active", true)
-        .text("Age (Median)");
+        .text("Obesity (%)");
 
-
-    // append y axis
-    chartGroup.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 0 - margin.left)
-        .attr("x", 0 - (height / 2))
-        .attr("dy", "1em")
-        .classed("axis-text", true)
-        .text("Obesity");
     
     // updateToolTip function above csv import
-    var circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
+    var circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
 
     // x axis labels event listener
-    labelsGroup.selectAll("text")
+    xLabelsGroup.selectAll("text")
         .on("click", function() {
             var value = d3.select(this).attr("value");
             if (value !== chosenXAxis) {
@@ -277,20 +268,96 @@ d3.csv("./assets/data/data.csv").then((healthData) => {
 
                 xAxis = renderAxes(xLinearScale, xAxis);
 
-                circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis);
+                circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis);
 
-                circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
+                textGroup = renderText(textGroup, xLinearScale, chosenXAxis, yLinearScale, choseYAxis);
 
-                if (chosenXAxis === "smokes") {
-                    smokesLabel
+                circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
+
+                if (chosenXAxis === "poverty") {
+                    povertyLabel
                         .classed("active", true)
                         .classed("inactive", false);
+                    ageLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    incomeLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                } else if (chosenXAxis === "age") {
+                    ageLabel
+                        .classed("active", true)
+                        .classed("inactive", false);
+                    povertyLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    incomeLabel 
+                        .classed("active", false)
+                        .classed("inactive", true);
+                } else {
                     incomeLabel
                         .classed("active", true)
                         .classed("inactive", false);
+                    povertyLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    ageLabel    
+                        .classed("active", false)
+                        .classed("inactive", true);
                 }
             }
         });
+    // y-axis event listeners 
+    yLabelsGroup.selectAll("text")
+    .on("click", function() {
+        var value = d3.select(this).attr("value");
+        if (value !== chosenYAxis) {
+
+            chosenYAxis = value;
+
+            yLinearScale = yScale(healthData, chosenYAxis);
+
+            yAxis = renderAxes(yLinearScale, yAxis);
+
+            circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis);
+
+            textGroup = renderText(textGroup, xLinearScale, chosenXAxis, yLinearScale, choseYAxis);
+
+            circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
+
+            if (chosenXAxis === "poverty") {
+                povertyLabel
+                    .classed("active", true)
+                    .classed("inactive", false);
+                ageLabel
+                    .classed("active", false)
+                    .classed("inactive", true);
+                incomeLabel
+                    .classed("active", false)
+                    .classed("inactive", true);
+            } else if (chosenXAxis === "age") {
+                ageLabel
+                    .classed("active", true)
+                    .classed("inactive", false);
+                povertyLabel
+                    .classed("active", false)
+                    .classed("inactive", true);
+                incomeLabel 
+                    .classed("active", false)
+                    .classed("inactive", true);
+            } else {
+                incomeLabel
+                    .classed("active", true)
+                    .classed("inactive", false);
+                povertyLabel
+                    .classed("active", false)
+                    .classed("inactive", true);
+                ageLabel    
+                    .classed("active", false)
+                    .classed("inactive", true);
+            }
+        }
+    });
 
 }).catch(function(error) {
     console.log(error);
