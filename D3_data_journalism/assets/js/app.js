@@ -18,7 +18,7 @@ var height = svgHeight - margin.top - margin.bottom;
 var chart = d3
     .select("#scatter")
     .append("div")
-    .classed("chart", true)
+    .classed("chart", true);
    
 var svg = chart.append("svg")   
     .attr("width", svgWidth)
@@ -35,7 +35,8 @@ var chosenYAxis = "healthcare";
 function xScale(healthData, chosenXAxis) {
     // create scales
     var xLinearScale = d3.scaleLinear()
-      .domain([d3.min(healthData, d => d[chosenXAxis]) * 0.8, d3.max(healthData, d => d[chosenXAxis]) * 1.2])
+      .domain([d3.min(healthData, d => d[chosenXAxis]) * 0.8, 
+        d3.max(healthData, d => d[chosenXAxis]) * 1.2])
       .range([0, width]);
   
     return xLinearScale;
@@ -46,8 +47,9 @@ function xScale(healthData, chosenXAxis) {
 function yScale(healthData, chosenYAxis) {
     // create scales
     var yLinearScale = d3.scaleLinear()
-        .domain([d3.min(healthData, d => d[chosenYAxis]) * 0.8, d3.max(healthData, d => d[chosenYAxis]) * 1.2])
-        .range([0, width]);
+        .domain([d3.min(healthData, d => d[chosenYAxis]) * 0.8, 
+            d3.max(healthData, d => d[chosenYAxis]) * 1.2])
+        .range([height, 0]);
     
     return yLinearScale;
 }
@@ -64,7 +66,7 @@ function renderAxes(newXScale, xAxis) {
 }
 
 function renderAxes(newYScale, yAxis) {
-    var leftAxis = d3.axisBottom(newYScale);
+    var leftAxis = d3.axisLeft(newYScale);
   
     yAxis.transition()
       .duration(1000)
@@ -92,6 +94,22 @@ function renderText(textGroup, newXScale, chosenXAxis, newYScale, choseYAxis) {
         .duration(1000)
         .attr("x", d => newXScale(d[chosenXAxis]))
         .attr("y", d => newYScale(d[chosenYAxis]));
+    
+    return textGroup;
+}
+
+// style function for x-axis and tooltips 
+function styleX(value, chosenXAxis) {
+
+    if (chosenXAxis === "poverty") {
+        return `${value}`;
+    }
+    else if (chosenXAxis === "income") {
+        return `$${value}`;
+    }
+    else {
+        return `${value}`;
+    }
 }
   
   // function used for updating circles group with new tooltip
@@ -164,7 +182,7 @@ d3.csv("./assets/data/data.csv").then((healthData) => {
         .attr("transform", `translate(0, ${height})`)
         .call(bottomAxis);
     
-    var yAxis = chartGroup.appen("g")
+    var yAxis = chartGroup.append("g")
         .classed("y-axis", true)
         .call(leftAxis);
     
@@ -360,6 +378,6 @@ d3.csv("./assets/data/data.csv").then((healthData) => {
         }
     });
 
-}).catch(function(error) {
-    console.log(error);
+// }).catch(function(error) {
+//     console.log(error);
 });
