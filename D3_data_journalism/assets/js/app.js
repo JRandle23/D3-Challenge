@@ -222,7 +222,7 @@ d3.csv("./assets/data/data.csv").then((healthData) => {
     var yLabelsGroup = chartGroup.append("g")
         .attr("transform", `translate(${0 - margin.left / 4}, ${height / 2})`);
     
-    var healthcareLabel = yLabelsGroup.append("g")
+    var healthcareLabel = yLabelsGroup.append("text")
         .attr("x", 0)
         .attr("y", 0 - 20)
         .attr("dy", "1em")
@@ -232,8 +232,25 @@ d3.csv("./assets/data/data.csv").then((healthData) => {
         .attr("active", true)
         .text("Without Healthcare (%)");
     
-    var smokesLabel = yLabelsGroup.append("g")
-    
+    var smokesLabel = yLabelsGroup.append("text")
+        .attr("x", 0)
+        .attr("y", 0 - 40)
+        .attr("dy", "1em")
+        .attr("transform", "rotate(-90)")
+        .attr("aText", true)
+        .attr("active", true)
+        .attr("value", "smokes")
+        .text("Smokers (%)");
+
+    var ageLabel = yLabelsGroup.append("text")
+        .attr("x", 0)
+        .attr("y", 0 - 60)
+        .attr("dy", "1em")
+        .attr("transform", "rotate(-90)")
+        .attr("value", "age")
+        .attr("aText", true)
+        .attr("active", true)
+        .text("Age (Median)");
 
 
     // append y axis
