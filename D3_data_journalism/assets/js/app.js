@@ -1,3 +1,4 @@
+  
 // // @TODO: YOUR CODE HERE!
 var svgWidth = 960;
 var svgHeight = 500;
@@ -14,9 +15,12 @@ var height = svgHeight - margin.top - margin.bottom;
 
 // Create an SVG wrapper, append an SVG group that will hold our chart,
 // and shift the latter by left and top margins.
-var svg = d3
+var chart = d3
     .select("#scatter")
-    .append("svg")
+    .append("div")
+    .classed("chart", true)
+   
+var svg = chart.append("svg")   
     .attr("width", svgWidth)
     .attr("height", svgHeight);
     
@@ -24,19 +28,28 @@ var svg = d3
 var chartGroup = svg.append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-var chosenXAxis = "income";
+var chosenXAxis = "poverty";
+var chosenYAxis = "healthcare";
 
 // function used for updating x-scale var upon click on axis label
 function xScale(healthData, chosenXAxis) {
     // create scales
     var xLinearScale = d3.scaleLinear()
-      .domain([d3.min(healthData, d => d[chosenXAxis]) * 0.8,
-        d3.max(healthData, d => d[chosenXAxis]) * 1.2
-      ])
+      .domain([d3.min(healthData, d => d[chosenXAxis]) * 0.8, d3.max(healthData, d => d[chosenXAxis]) * 1.2])
       .range([0, width]);
   
     return xLinearScale;
   
+}
+
+// function used for updating x-scale var upon click on axis label
+function yScale(healthData, chosenYAxis) {
+    // create scales
+    var yLinearScale = d3.scaleLinear()
+        .domain([d3.min(healthData, d => d[chosenYAxis]) * 0.8, d3.max(healthData, d => d[chosenYAxis]) * 1.2])
+        .range([0, width]);
+    
+    return yLinearScale;
 }
 
 // function used for updating xAxis var upon click on axis label
@@ -50,26 +63,35 @@ function renderAxes(newXScale, xAxis) {
     return xAxis;
 }
 
+function renderAxes(newYScale, yAxis) {
+    var leftAxis = d3.axisBottom(newYScale);
+  
+    yAxis.transition()
+      .duration(1000)
+      .call(leftAxis);
+  
+    return yAxis;
+}
+
+
 // function used for updating circles group with a transition to
 // new circles
-function renderCircles(circlesGroup, newXScale, chosenXAxis) {
+function renderCircles(circlesGroup, newXScale, chosenXAxis, newYScale, chosenYAxis) {
 
     circlesGroup.transition()
       .duration(1000)
-      .attr("cx", d => newXScale(d[chosenXAxis]));
+      .attr("cx", d => newXScale(d[chosenXAxis]))
+      .attr("cy", d => newYScale(d[chosenYAxis]));
   
     return circlesGroup;
 }
 
-// function used for updating circles group with a transition to
-// new circles
-function renderCircles(circlesGroup, newXScale, chosenXAxis) {
-
-    circlesGroup.transition()
-      .duration(1000)
-      .attr("cx", d => newXScale(d[chosenXAxis]));
-  
-    return circlesGroup;
+// function used for updating state labels with a transition to new circles
+function renderText(textGroup, newXScale, chosenXAxis, newYScale, choseYAxis) {
+    textGroup.transition()
+        .duration(1000)
+        .attr("x", d => newXScale(d[chosenXAxis]))
+        .attr("y", d => newYScale(d[chosenYAxis]));
 }
   
   // function used for updating circles group with new tooltip
@@ -203,7 +225,7 @@ d3.csv("./assets/data/data.csv").then((healthData) => {
                         .classed("inactive", false);
                 }
             }
-    });
+        });
 
 }).catch(function(error) {
     console.log(error);
