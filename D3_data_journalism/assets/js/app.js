@@ -27,7 +27,7 @@ function makeResponsive() {
         .select("#scatter")
         .append("svg")
         .attr("width", svgWidth)
-        .attr("height", svgHeight);
+        .attr("height", svgHeight + 50);
     
 
         
@@ -54,8 +54,8 @@ function makeResponsive() {
     function yScale(healthData, chosenYAxis) {
         // create scales
         var yLinearScale = d3.scaleLinear()
-            .domain([d3.min(healthData, d => d[chosenYAxis]) * 0.8, 
-                d3.max(healthData, d => d[chosenYAxis]) * 1.2])
+            .domain([d3.min(healthData, d => d[chosenYAxis]) - 2, 
+                d3.max(healthData, d => d[chosenYAxis]) + 2])
             .range([height, 0]);
         
         return yLinearScale;
@@ -147,24 +147,38 @@ function makeResponsive() {
 
 
     
-        const toolTip = d3.tip()
+        var toolTip = d3.tip()
             .attr("class", "d3-tip")
             .offset([80, -60])
             .html(function(d) {
-                return (`${d.abbr}<br>${xLabel} ${styleX(d[chosenXAxis])}<br>${yLabel} ${d[chosenYAxis]}`);
-            });
+                if (chosenYAxis === "smokes" || chosenYAxis === "obesity") {
+                    if (chosenXAxis === "poverty") {
+                        return(`${d.state}, ${d.abbr}<br>${xLabel}${styleX(d[chosenXAxis])}%<br>${yLabel}${d[chosenYAxis]}%`)
+                    }
+                    return (`${d.state},${d.abbr}<br>${xLabel} ${styleX(d[chosenXAxis])}<br>${yLabel} ${d[chosenYAxis]}`)
+                }
+                else if (chosenXAxis === "poverty") {
+                    return(`${d.state},${d.abbr}<br>${xLabel}${styleX(d[chosenXAxis])}%<br>${yLabel}${d[chosenYAxis]}`)
+                }
+                else {
+                    return(`${d.state},${d.abbr}<br>${xLabel}${styleX(d[chosenXAxis])}<br>${yLabel}${d[chosenYAxis]}`)
+                }
+            })
     
         circlesGroup.call(toolTip);
     
         circlesGroup.on("mouseover", function(data) {
-            toolTip.show(data, this);
-            // .on("mouseout", toolTip.hide);
+            toolTip.show(data, this)
+            d3.select(this).style("stroke", "black");
         })
-            .on("mouseout", function(data) {
-                toolTip.hide(data);
-            });
+        circlesGroup.on("mouseout", function(data, index) {
+            toolTip.hide(data)
+            d3.select(this).style("stroke", "white");
+        })
+        return circlesGroup;
+    
         
-        textGroup.call(toolTip);
+        
 
         textGroup.on("mouseover", function(data) {
             toolTip.show(data, this);
@@ -172,14 +186,15 @@ function makeResponsive() {
             .on("mouseout", function(data) {
                 toolTip.hide(data);
             });
-        return circlesGroup;
+        return textGroup;
 
-    }
+        }
 
 
     d3.csv("./assets/data/data.csv").then((healthData) => {
         console.log(healthData);
 
+        //  Parse data
         healthData.forEach((data) => {
             data.income = +data.income;
             data.obesity = +data.obesity;
@@ -187,7 +202,7 @@ function makeResponsive() {
             data.age = +data.age;
             data.healthcare = +data.health_care;
             data.poverty = +data.poverty;
-        });
+        })
 
         // Create linear scales
         var xLinearScale = xScale(healthData, chosenXAxis);
@@ -218,8 +233,7 @@ function makeResponsive() {
             .attr("cx", d => xLinearScale(d[chosenXAxis]))
             .attr("cy", d => yLinearScale(d[chosenYAxis]))
             .attr("r", 15)
-            // .attr("fill", "pink")
-            .attr("opacity", ".8");
+            .attr("opacity", "1");
         
         var textGroup = chartGroup.selectAll(".stateText")
             .data(healthData)
@@ -227,20 +241,22 @@ function makeResponsive() {
             .append("text")
             .classed("stateText", true)
             .attr("x", d => xLinearScale(d[chosenXAxis]))
-            .attr("y", d => yLinearScale(d[chosenYAxis] * .98))
+            .attr("y", d => yLinearScale(d[chosenYAxis] + 3))
             .attr("dy", 1)
-            .attr("font-size", "10px")
+            .style("font-size", "10px")
+            .style("font-weight", "400")
             .attr("text-anchor", "middle")
             .text(d => (d.abbr));
         
         // Create x axis labels group
         var xLabelsGroup = chartGroup.append("g")
-            .attr("transform", `translate(${width / 2}, ${height + 20})`);
+            .attr("transform", `translate(${width / 2}, ${height + 20 + margin.top})`);
         
         var povertyLabel = xLabelsGroup.append("text")
             .attr("x", 0)
             .attr("y", 20)
             .attr("value", "poverty")
+            .classed("aText", true)
             .classed("active", true)
             .text("In Poverty (%)")
 
@@ -248,7 +264,7 @@ function makeResponsive() {
             .attr("x", 0)
             .attr("y", 40)
             .attr("value", "income")
-            .attr("aText", true)
+            .classed("aText", true)
             .classed("inactive", true)
             .text("Median Household Income ($)");
 
@@ -256,13 +272,13 @@ function makeResponsive() {
             .attr("x", 0)
             .attr("y", 60)
             .attr("value", "age")
-            .attr("aText", true)
+            .classed("aText", true)
             .classed("inactive", true)
             .text("Age (Median)");
         
         // Create y labels group
         var yLabelsGroup = chartGroup.append("g")
-            .attr("transform", `translate(-25, ${height / 2})`);
+            .attr("transform", `translate(${0-margin.left/4}, ${height / 2})`);
         
         var healthcareLabel = yLabelsGroup.append("text")
             .attr("x", 0)
@@ -271,7 +287,7 @@ function makeResponsive() {
             .attr("transform", "rotate(-90)")
             .attr("value", "healthcare")
             .classed("aText", true)
-            .classed("active", true)
+            .classed("inactive", true)
             .text("Without Healthcare (%)");
         
         var smokesLabel = yLabelsGroup.append("text")
@@ -279,8 +295,8 @@ function makeResponsive() {
             .attr("y", -50)
             .attr("dy", "1em")
             .attr("transform", "rotate(-90)")
-            .attr("aText", true)
-            .attr("inactive", true)
+            .classed("aText", true)
+            .classed("inactive", true)
             .attr("value", "smokes")
             .text("Smokers (%)");
 
@@ -290,8 +306,8 @@ function makeResponsive() {
             .attr("dy", "1em")
             .attr("transform", "rotate(-90)")
             .attr("value", "obesity")
-            .attr("aText", true)
-            .attr("inactive", true)
+            .classed("aText", true)
+            .classed("active", true)
             .text("Obesity (%)");
 
         
@@ -368,16 +384,16 @@ function makeResponsive() {
 
                     circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup, textGroup);
 
-                    if (chosenYAxis === "healthcare") {
+                    if (chosenYAxis === "obesity") {
                         healthcareLabel
-                            .classed("active", true)
+                            .classed("active", false)
                             .classed("inactive", false);
                         smokesLabel
                             .classed("active", false)
                             .classed("inactive", true);
                         obesityLabel
-                            .classed("active", false)
-                            .classed("inactive", true);
+                            .classed("active", true)
+                            .classed("inactive", false);
                     } else if (chosenYAxis === "smokes") {
                         smokesLabel
                             .classed("active", true)
@@ -390,14 +406,14 @@ function makeResponsive() {
                             .classed("inactive", true);
                     } else {
                         obesityLabel
+                            .classed("active", false)
+                            .classed("inactive", true);
+                        healthcareLabel
                             .classed("active", true)
                             .classed("inactive", false);
-                        healthcareLabel
-                            .classed("active", false)
-                            .classed("inactive", true);
                         smokesLabel    
                             .classed("active", false)
-                            .classed("inactive", true);
+                            .classed("inactive", true );
                     }
                 }
             });
