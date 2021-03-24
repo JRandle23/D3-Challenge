@@ -181,6 +181,17 @@ d3.csv("./assets/data/data.csv").then((healthData) => {
         // .attr("fill", "pink")
         .attr("opacity", ".8");
     
+    var textGroup = chartGroup.selectAll(".stateText")
+        .data(healthData)
+        .enter()
+        .append("text")
+        .classed("stateText", true)
+        .attr("x", d => xLinearScale(d[chosenXAxis]))
+        .attr("y", d => yLinearScale(d[chosenYAxis]))
+        .attr("dy", 3)
+        .attr("font-size", "10px")
+        .text(function(d) { return d.abbr });
+    
     // Create group for two x-axis labels
     var labelsGroup = chartGroup.append("g")
         .attr("transform", `translate(${width / 2}, ${height + 20})`);
